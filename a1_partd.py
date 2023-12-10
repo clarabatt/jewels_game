@@ -28,11 +28,6 @@ def get_overflow_list(grid):
 
 
 def overflow(grid, a_queue):
-
-    same_sign = all(all(cell >= 0 for cell in row) or all(cell < 0 for cell in row) for row in grid)
-    if same_sign:
-        return 1
-        
     overflow_list = get_overflow_list(grid)
     if overflow_list is None:
         return 0
@@ -69,5 +64,11 @@ def overflow(grid, a_queue):
             new_grid[i][j] = -(abs(new_grid[i][j]) - abs(grid[i][j]))
 
     a_queue.enqueue(new_grid)
+    
+    same_sign = all(all(cell >= 0 for cell in row) or all(cell < 0 for cell in row) for row in new_grid)
+    if same_sign:
+        return 1
+
+  
 
     return 1 + overflow(new_grid, a_queue)
