@@ -64,12 +64,15 @@ class GameTree:
 
         overflow_cells = get_overflow_list(node.board)
 
-        for cell in overflow_cells:
-            new_board = copy_board(node.board)
-            overflow(new_board, cell)
-            new_node = self.Node(new_board, new_depth, depth_player, self.tree_height)
-            node.children.append(new_node)
-            self.build_tree(new_node, new_depth)
+        if overflow_cells is not None:
+            for cell in overflow_cells:
+                new_board = copy_board(node.board)
+                overflow(new_board, cell)
+                new_node = self.Node(
+                    new_board, new_depth, depth_player, self.tree_height
+                )
+                node.children.append(new_node)
+                self.build_tree(new_node, new_depth)
 
     def get_move(self):
         height = len(self.board)
