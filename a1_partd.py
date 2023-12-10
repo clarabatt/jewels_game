@@ -1,13 +1,18 @@
 # copy over your a1_partd.py file here
 # don't forget to update your overflow() function
 
-#    Main Author(s):
+#    Main Author(s): Oscar Daniel Camacho Cepeda, Clara Verena Brito Battesini
 #    Main Reviewer(s):
 
 from a1_partc import Queue
 
 
 def get_overflow_list(grid):
+    """
+    Identify the cells that are overflowing
+    Return: the list of cells that overflow.
+    If no cells meet the criteria, it returns None
+    """
     cells = []
     for i, lines in enumerate(grid):
         for j, cell in enumerate(lines):
@@ -28,6 +33,10 @@ def get_overflow_list(grid):
 
 
 def overflow(grid, a_queue):
+    """
+    Modifies the board passed based on the overflow rule and uses recursion to handle subsequent overflows resulting from the initial changes.
+    Return: The number of times the overflow rule was applied.
+    """
     overflow_list = get_overflow_list(grid)
     if overflow_list is None:
         return 0
@@ -64,11 +73,12 @@ def overflow(grid, a_queue):
             new_grid[i][j] = -(abs(new_grid[i][j]) - abs(grid[i][j]))
 
     a_queue.enqueue(new_grid)
-    
-    same_sign = all(all(cell >= 0 for cell in row) or all(cell < 0 for cell in row) for row in new_grid)
+
+    same_sign = all(
+        all(cell >= 0 for cell in row) or all(cell < 0 for cell in row)
+        for row in new_grid
+    )
     if same_sign:
         return 1
-
-  
 
     return 1 + overflow(new_grid, a_queue)
