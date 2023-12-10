@@ -4,10 +4,10 @@
 from a3_parta import evaluate_board
 
 
-# This function duplicates and returns the board. You may find this useful
-
-
 def copy_board(board):
+    """
+    This function duplicates and returns the board
+    """
     current_board = []
     height = len(board)
     for i in range(height):
@@ -16,8 +16,19 @@ def copy_board(board):
 
 
 class GameTree:
+    """
+    Decision Tree class for the game
+    """
+
     class Node:
+        """
+        Node class for the GameTree class
+        """
+
         def __init__(self, board, depth, player, tree_height=4):
+            """
+            Node class constructor, empty children list and score
+            """
             self.board = board
             self.depth = depth
             self.player = player
@@ -26,6 +37,9 @@ class GameTree:
             self.score = None
 
     def __init__(self, board, player, tree_height=4):
+        """
+        Tree constructor, creates the root node and builds the tree
+        """
         self.player = player
         self.board = copy_board(board)
         self.tree_height = tree_height
@@ -58,6 +72,9 @@ class GameTree:
             return (height - 1, width - 1)
 
     def _clear_tree_recursive(self, node):
+        """
+        Helper function that clears the tree recursively
+        """
         if node.children == []:
             return
         for child in node.children:
@@ -65,4 +82,7 @@ class GameTree:
         node.children = []
 
     def clear_tree(self):
+        """
+        Clears the tree trigger function
+        """
         self._clear_tree_recursive(self.root)
