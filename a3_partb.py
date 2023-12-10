@@ -1,10 +1,10 @@
-# Main Author:
+# Main Author: Clara Verena Brito Battesini
 # Main Reviewer:
-
-# This function duplicates and returns the board. You may find this useful
 
 from a3_parta import evaluate_board
 
+
+# This function duplicates and returns the board. You may find this useful
 
 def copy_board(board):
     current_board = []
@@ -56,5 +56,12 @@ class GameTree:
         else:
             return (height - 1, width - 1)
 
+    def _clear_tree_recursive(self, node):
+        if node.children == []:
+            return
+        for child in node.children:
+            self._clear_tree_recursive(child)
+        node.children = []
+
     def clear_tree(self):
-        pass
+        self._clear_tree_recursive(self.root)
