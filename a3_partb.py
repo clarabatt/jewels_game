@@ -75,12 +75,21 @@ class GameTree:
                 self.build_tree(new_node, new_depth)
 
     def get_move(self):
-        height = len(self.board)
-        width = len(self.board[0])
-        if self.player == 1:
-            return (0, 0)
-        else:
-            return (height - 1, width - 1)
+        best_score = 0
+        best_move = None
+
+        potential_moves = get_overflow_list(self.root.board)
+
+        for move in potential_moves:
+            new_board = copy_board(self.root.board)
+            overflow(new_board, move)
+            score = self.evaluate(new_board)
+
+            if score > best_score:
+                best_score = score
+                best_move = move
+
+        return best_move
 
     def _clear_tree_recursive(self, node):
         """
