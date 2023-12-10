@@ -1,6 +1,7 @@
 # Main Author: Clara Verena Brito Battesini
 # Main Reviewer:
 
+from a1_partd import get_overflow_list, overflow
 from a3_parta import evaluate_board
 
 
@@ -46,22 +47,29 @@ class GameTree:
         self.root = self.Node(self.board, 0, self.player, self.tree_height)
         self.build_tree(self.root, 0)
 
-    def build_tree(self, node, current_height):
-        if current_height == self.tree_height:
+    def build_tree(self, node, current_depth):
+        """
+        Builds the tree recursively creating child nodes for each possible state resulting from the overflow mechanic and alternates between players at each level of the tree.
+        Each leaf node is assigned a score based on the evaluate_board function.
+        """
+        depth_player = node.player
+        new_depth = current_depth + 1
+
+        if (new_depth % 2) == 0:
+            depth_player = node.player * -1
+
+        if current_depth >= self.tree_height:
+            node.score = evaluate_board(node.board, self.player)
             return
-        for i in range(len(node.board)):
-            for j in range(len(node.board[i])):
-                if node.board[i][j] == 0:
-                    new_board = copy_board(node.board)
-                    new_board[i][j] = node.player
-                    new_node = self.Node(
-                        new_board,
-                        current_height + 1,
-                        node.player * -1,
-                        self.tree_height,
-                    )
-                    node.children.append(new_node)
-                    self.build_tree(new_node, current_height + 1)
+
+        overflow_cells = get_overflow_list(node.board)
+
+        for cell in overflow_cells:
+            new_board = copy_board(node.board)
+            overflow(new_board, cell)
+            new_node = self.Node(new_board, new_depth, depth_player, self.tree_height)
+            node.children.append(new_node)
+            self.build_tree(new_node, new_depth)
 
     def get_move(self):
         height = len(self.board)
