@@ -6,6 +6,7 @@ from a3_parta import evaluate_board
 
 # This function duplicates and returns the board. You may find this useful
 
+
 def copy_board(board):
     current_board = []
     height = len(board)
