@@ -3,7 +3,7 @@
 
 from a1_partc import Queue
 from a1_partd import get_overflow_list, overflow
-from a3_parta import evaluate_board
+from a3_parta import evaluate_board, check_if_both_has_same_signal
 
 
 def copy_board(board):
@@ -56,6 +56,7 @@ class GameTree:
         """
         depth_player = node.player
         new_depth = current_depth + 1
+        max_score = len(node.board) * len(node.board)
 
         if (new_depth % 2) == 0:
             depth_player = node.player * -1
@@ -66,24 +67,45 @@ class GameTree:
 
         # Generate all valid moves
 
-        for i in range(len(node.board)):
-            for j in range(len(node.board[i])):
-                if node.board[i][j] == 0 or node.board[i][j] == depth_player:
-                    new_board = copy_board(node.board)
-                    new_board[i][j] += depth_player
+        # [ 0 , 2,  -2, 0, 0,  0],
+        # [ 0,  0 , -3,  -1,  0,  0],
+        # [ 0,  0,  0,  0,  0, 0],
+        # [ 0,  0,  0,  0,  2, 0],
+        # [ 0,  0,  0,  2,  0, 0]
 
-                    the_queue = Queue()
-                    overflow(new_board, the_queue)
+        # [ 0 , 2,  2, 0, 0,  0],
+        # [ 0,  0 , 3,  1,  0,  0],
+        # [ 0,  0,  0,  0,  0, 0],
+        # [ 0,  0,  0,  0,  2, 0],
+        # [ 0,  0,  0,  2,  0, 0]
+
+        for i in range(len(node.board)):
+            for j, cell in enumerate(node.board[i]):
+                if cell == 0 or check_if_both_has_same_signal(cell, depth_player):
+                    new_board = copy_board(node.board)
+                    print("new_board", new_board, depth_player)
+                    new_board[i][j] = new_board[i][j] + depth_player
+                    print("new_board", new_board)
+
+                    is_overflow_possible = get_overflow_list(new_board)
+                    print("get_overflow_list", is_overflow_possible)
+
+                    # Perform the overflow and repopulate the new_board
+                    if (is_overflow_possible):
+                        overflow_result = Queue()
+                        overflow(new_board, overflow_result)
+                        print("RESULT OVERFLOW", overflow_result.get_front())
+                        for i in enumerate(node.board):
+                            tmp = overflow_result.dequeue()
+                            print("TEMP", tmp, i)
+
                     new_node = self.Node(
                         new_board, new_depth, depth_player, self.tree_height
                     )
                     new_node.move_coordinates = (i, j)
-
                     node.children.append(new_node)
 
-                    if not evaluate_board(new_board, self.player) == len(
-                        new_board
-                    ) * len(new_board):
+                    if not evaluate_board(new_board, self.player) == max_score or not current_depth == self.tree_height - 1:
                         self.build_tree(new_node, new_depth)
 
         if node.children:
