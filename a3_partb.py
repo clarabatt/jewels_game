@@ -83,21 +83,18 @@ class GameTree:
             for j, cell in enumerate(node.board[i]):
                 if cell == 0 or check_if_both_has_same_signal(cell, depth_player):
                     new_board = copy_board(node.board)
-                    print("new_board", new_board, depth_player)
+                    # print("new_board", new_board, depth_player)
                     new_board[i][j] = new_board[i][j] + depth_player
-                    print("new_board", new_board)
+                    # print("new_board", new_board)
 
                     is_overflow_possible = get_overflow_list(new_board)
-                    print("get_overflow_list", is_overflow_possible)
+                    # print("get_overflow_list", is_overflow_possible)
 
                     # Perform the overflow and repopulate the new_board
                     if (is_overflow_possible):
                         overflow_result = Queue()
                         overflow(new_board, overflow_result)
-                        print("RESULT OVERFLOW", overflow_result.get_front())
-                        for i in enumerate(node.board):
-                            tmp = overflow_result.dequeue()
-                            print("TEMP", tmp, i)
+                        new_board = overflow_result.dequeue()
 
                     new_node = self.Node(
                         new_board, new_depth, depth_player, self.tree_height
