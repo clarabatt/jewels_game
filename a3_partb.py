@@ -54,12 +54,14 @@ class GameTree:
         Builds the tree recursively creating child nodes for each possible state resulting from the overflow mechanic and alternates between players at each level of the tree.
         Each leaf node is assigned a score based on the evaluate_board function.
         """
-        depth_player = node.player
-        new_depth = current_depth + 1
-        max_score = len(node.board) * len(node.board)
-
-        if (new_depth % 2) == 0:
+        if current_depth == 0:
+            depth_player = node.player
+        else:
             depth_player = node.player * -1
+
+        print(depth_player, ' is playing')
+        new_depth = current_depth + 1
+        max_score = len(node.board) * len(node.board)            
 
         if current_depth >= self.tree_height:
             node.score = evaluate_board(node.board, self.player)
@@ -71,7 +73,7 @@ class GameTree:
         # [ 0,  0 , -3,  -1,  0,  0],
         # [ 0,  0,  0,  0,  0, 0],
         # [ 0,  0,  0,  0,  2, 0],
-        # [ 0,  0,  0,  2,  0, 0]
+        # [ 0,  0,  0,  2,  0, 0]s
 
         # [ 0 , 2,  2, 0, 0,  0],
         # [ 0,  0 , 3,  1,  0,  0],
@@ -83,21 +85,32 @@ class GameTree:
             for j, cell in enumerate(node.board[i]):
                 if cell == 0 or check_if_both_has_same_signal(cell, depth_player):
                     new_board = copy_board(node.board)
+                    print(new_board, 'board that is being used to play')
+
                     # print("new_board", new_board, depth_player)
                     new_board[i][j] = new_board[i][j] + depth_player
                     # print("new_board", new_board)
 
+                    print(new_board, 'board after player ', depth_player, ' plays')
+
                     is_overflow_possible = get_overflow_list(new_board)
                     # print("get_overflow_list", is_overflow_possible)
+                    
 
                     # Perform the overflow and repopulate the new_board
                     if (is_overflow_possible):
                         overflow_result = Queue()
                         overflow(new_board, overflow_result)
+                        while(overflow_result.size > 1):
+                            dequed_element = 0
+                            dequed_element = overflow_result.dequeue()
+                            print(dequed_element)
                         new_board = overflow_result.dequeue()
+                        print(new_board, 'board after overflowing (if overflowing)')
+
 
                     new_node = self.Node(
-                        new_board, new_depth, depth_player, self.tree_height
+                        new_board, new_depth, depth_player, node.tree_height - 1
                     )
                     new_node.move_coordinates = (i, j)
                     node.children.append(new_node)
@@ -105,11 +118,11 @@ class GameTree:
                     if not evaluate_board(new_board, self.player) == max_score or not current_depth == self.tree_height - 1:
                         self.build_tree(new_node, new_depth)
 
-        if node.children:
-            if node.player == self.player:
-                node.score = max(child.score for child in node.children)
-            else:
-                node.score = min(child.score for child in node.children)
+        # if node.children:
+        #     if node.player == self.player:
+        #         node.score = max(child.score for child in node.children)
+        #     else:
+        #         node.score = min(child.score for child in node.children)
 
     def get_scores_by_depth(self, target_depth):
         if target_depth < 0:
