@@ -1,6 +1,7 @@
 # Main Author: Clara Verena Brito Battesini
 # Main Reviewer:
 
+from a1_partc import Queue
 from a1_partd import get_overflow_list, overflow
 from a3_parta import evaluate_board
 
@@ -32,6 +33,7 @@ class GameTree:
             """
             self.board = board
             self.depth = depth
+            self.move_coordinates = None
             self.player = player
             self.tree_height = tree_height
             self.children = []
@@ -62,34 +64,56 @@ class GameTree:
             node.score = evaluate_board(node.board, self.player)
             return
 
-        overflow_cells = get_overflow_list(node.board)
+        # Generate all valid moves
 
-        if overflow_cells is not None:
-            for cell in overflow_cells:
-                new_board = copy_board(node.board)
-                overflow(new_board, cell)
-                new_node = self.Node(
-                    new_board, new_depth, depth_player, self.tree_height
-                )
-                node.children.append(new_node)
-                self.build_tree(new_node, new_depth)
+        for i in range(len(node.board)):
+            for j in range(len(node.board[i])):
+                if node.board[i][j] == 0 or node.board[i][j] == depth_player:
+                    new_board = copy_board(node.board)
+                    new_board[i][j] += depth_player
+
+                    the_queue = Queue()
+                    overflow(new_board, the_queue)
+                    new_node = self.Node(
+                        new_board, new_depth, depth_player, self.tree_height
+                    )
+                    new_node.move_coordinates = (i, j)
+
+                    node.children.append(new_node)
+
+                    if not evaluate_board(new_board, self.player) == len(
+                        new_board
+                    ) * len(new_board):
+                        self.build_tree(new_node, new_depth)
+
+        if node.children:
+            if node.player == self.player:
+                node.score = max(child.score for child in node.children)
+            else:
+                node.score = min(child.score for child in node.children)
+
+    def get_scores_by_depth(self, target_depth):
+        if target_depth < 0:
+            raise ValueError("Depth must be non-negative")
+
+        queue = Queue()
+        queue.enqueue((self.root, 0))
+        scores_at_depth = []
+
+        while not queue.is_empty():
+            node, depth = queue.dequeue()
+
+            if depth == target_depth:
+                scores_at_depth.append(node.score)
+            elif depth < target_depth:
+                for child in node.children:
+                    queue.enqueue((child, depth + 1))
+
+        scores_at_depth.sort(reverse=True)
+        return scores_at_depth
 
     def get_move(self):
-        best_score = 0
-        best_move = None
-
-        potential_moves = get_overflow_list(self.root.board)
-
-        for move in potential_moves:
-            new_board = copy_board(self.root.board)
-            overflow(new_board, move)
-            score = self.evaluate(new_board)
-
-            if score > best_score:
-                best_score = score
-                best_move = move
-
-        return best_move
+        return self.get_scores_by_depth(self.tree_height - 1)[0].move_coordinates
 
     def _clear_tree_recursive(self, node):
         """
