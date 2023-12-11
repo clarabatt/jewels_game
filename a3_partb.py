@@ -114,9 +114,10 @@ class GameTree:
                     )
                     new_node.move_coordinates = (i, j)
                     node.children.append(new_node)
-
-                    if not evaluate_board(new_board, self.player) == max_score or not current_depth == self.tree_height - 1:
-                        self.build_tree(new_node, new_depth)
+                    print('new depth: ', new_depth)
+                    if new_depth < self.tree_height -1:
+                        if not evaluate_board(new_board, self.player) == max_score:
+                            self.build_tree(new_node, new_depth)
 
         # if node.children:
         #     if node.player == self.player:
