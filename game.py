@@ -179,10 +179,9 @@ FULL_DELAY = 5
 # the following are available blue, pink, yellow, orange, grey, green
 p1spritesheet = pygame.image.load("blue.png")
 p2spritesheet = pygame.image.load("pink.png")
-hint_sheet = pygame.image.load("orange.png")
+hint_sheet = pygame.image.load("lamp.png")
 p1_sprites = []
 p2_sprites = []
-hint_sprites = []
 
 
 player_id = [1, -1]
@@ -192,7 +191,6 @@ for i in range(8):
     curr_sprite = pygame.Rect(32 * i, 0, 32, 32)
     p1_sprites.append(p1spritesheet.subsurface(curr_sprite))
     p2_sprites.append(p2spritesheet.subsurface(curr_sprite))
-    hint_sprites.append(hint_sheet.subsurface(curr_sprite))
 
 
 frame = 0
@@ -293,8 +291,7 @@ while running:
     board.draw(window, frame)
     window.blit(p1_sprites[math.floor(frame)], (850, 60))
     window.blit(p2_sprites[math.floor(frame)], (850, 120))
-    window.blit(hint_sprites[math.floor(frame)], (850, 180))
-    # window.blit(hint_sheet, (850, 180))
+    window.blit(hint_sheet, (850, 180))
     frame = (frame + 0.5) % 8
     player1_dropdown.draw(window)
     player2_dropdown.draw(window)
