@@ -26,6 +26,7 @@ class Dropdown:
         self.height = height
         self.options = options
         self.current_option = 0
+        self.rect = pygame.Rect(x, y, width, height)
 
     def draw(self, window):
         pygame.draw.rect(window, BLACK, (self.x, self.y, self.width, self.height), 2)
@@ -53,6 +54,7 @@ class Board:
         self.board[0][0] = 1
         self.board[self.height - 1][self.width - 1] = -1
         self.turn = 0
+        self.highlight_pos = None
 
     def get_board(self):
         current_board = []
@@ -110,12 +112,27 @@ class Board:
             self.set(oldboard)
         return numsteps
 
+    def highlight_hint(self, move):
+        x, y = move
+        x += 1
+        self.highlight_pos = (x, y)
+
+    def remove_highlight(self):
+        self.highlight_pos = None
+
     def set(self, newboard):
         for row in range(self.height):
             for col in range(self.width):
                 self.board[row][col] = newboard[row][col]
 
     def draw(self, window, frame):
+        if self.highlight_pos is not None:
+            row, col = self.highlight_pos
+            hint_surface = pygame.Surface((CELL_SIZE, CELL_SIZE))
+            hint_surface.fill((255, 165, 0))
+            hint_pos = (col * CELL_SIZE, row * CELL_SIZE)
+            window.blit(hint_surface, hint_pos)
+
         for row in range(GRID_SIZE[0]):
             for col in range(GRID_SIZE[1]):
                 rect = pygame.Rect(
@@ -174,6 +191,7 @@ BLACK = (0, 0, 0)
 X_OFFSET = 0
 Y_OFFSET = 100
 FULL_DELAY = 5
+highlight_time = 0
 
 # hate the colours?  there are other options.  Just change the lines below to another colour's file name.
 # the following are available blue, pink, yellow, orange, grey, green
@@ -206,7 +224,7 @@ bigfont = pygame.font.Font(None, 108)
 # board = [[0 for _ in range(GRID_SIZE[0])] for _ in range(GRID_SIZE[1])]
 player1_dropdown = Dropdown(900, 50, 200, 50, ["Human", "AI"])
 player2_dropdown = Dropdown(900, 110, 200, 50, ["Human", "AI"])
-hints_dropdown = Dropdown(900, 170, 200, 50, ["Hints: 2", "Hints: 1", "Hints: 0"])
+hints_dropdown = Dropdown(900, 170, 200, 50, ["Hint"])
 
 status = ["", ""]
 current_player = 0
@@ -223,6 +241,13 @@ grid_row = -1
 choice = [None, None]
 while running:
     for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONUP:
+            pos = pygame.mouse.get_pos()
+            if hints_dropdown.rect.collidepoint(pos):
+                # hint_move = bots[current_player].get_hint(board.get_board())
+                board.highlight_hint((0, 0))
+                highlight_time = pygame.time.get_ticks()
+
         if event.type == pygame.QUIT:
             running = False
         else:
@@ -235,6 +260,9 @@ while running:
                 row = y - Y_OFFSET
                 col = x - X_OFFSET
                 grid_row, grid_col = row // CELL_SIZE, col // CELL_SIZE
+    if highlight_time > 0 and pygame.time.get_ticks() - highlight_time > 2000:
+        board.remove_highlight()
+        highlight_time = 0
 
     win = board.check_win()
     if win != 0:
