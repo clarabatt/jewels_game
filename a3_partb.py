@@ -66,15 +66,12 @@ class GameTree:
         Builds the tree recursively creating child nodes for each possible state resulting from the overflow mechanic and alternates between players at each level of the tree.
         Each leaf node is assigned a score based on the evaluate_board function.
         """
-        # print(" --- Building the tree --- ")
-        # print(" current depth: ", current_depth)
 
         if current_depth == 0:
             depth_player = node.player
         else:
             depth_player = node.player * -1
 
-        # print(depth_player, " is playing")
         new_depth = current_depth + 1
         max_score = len(node.board) * len(node.board)
 
@@ -100,7 +97,6 @@ class GameTree:
                         while overflow_result.size > 1:
                             dequed_element = 0
                             dequed_element = overflow_result.dequeue()
-                            print(dequed_element)
                         new_board = overflow_result.dequeue()
 
                     new_node = self.Node(
@@ -114,12 +110,9 @@ class GameTree:
                             self.build_tree(new_node, new_depth)
 
     def minimax(self, node, depth, is_maximizing_player):
-        print(" --- Minimax --- ")
-        print(" depth: ", depth)
-        print(" board: ", node.board)
-        print(" is_maximizing_player: ", is_maximizing_player)
-        print(" node player: ", node.player)
-
+        """
+        Minimax algorithm implementation
+        """
         if node.is_game_over():
             return node
 
@@ -128,25 +121,23 @@ class GameTree:
 
         for childen_node in node.children:
             possible_moves.append(childen_node)
-            # possible_moves.append(
-            #     self.minimax(childen_node, depth, not is_maximizing_player)
-            # )
 
         if not is_maximizing_player:
             # if the player is maximizing, return the maximum score
             possible_moves.sort(key=lambda node: node.score, reverse=True)
-            print("MAX SCORES: ", list(map(lambda node: node.score, possible_moves)))
             self.choice = possible_moves[0].move_coordinates
             return possible_moves[0]
 
         else:
             # if the player is minimizing, return the minimum score
             possible_moves.sort(key=lambda node: node.score)
-            print("MIN SCORES: ", list(map(lambda node: node.score, possible_moves)))
             self.choice = possible_moves[0].move_coordinates
             return possible_moves[0]
 
     def get_move(self):
+        """
+        Returns the move that the bot should make
+        """
         self.minimax(self.root, 0, False)
         return self.choice
 
