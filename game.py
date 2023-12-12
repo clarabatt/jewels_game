@@ -198,6 +198,7 @@ highlight_time = 0
 p1spritesheet = pygame.image.load("blue.png")
 p2spritesheet = pygame.image.load("pink.png")
 hint_sheet = pygame.image.load("lamp.png")
+undo_sheet = pygame.image.load("undo.png")
 p1_sprites = []
 p2_sprites = []
 
@@ -225,6 +226,7 @@ bigfont = pygame.font.Font(None, 108)
 player1_dropdown = Dropdown(900, 50, 200, 50, ["Human", "AI"])
 player2_dropdown = Dropdown(900, 110, 200, 50, ["Human", "AI"])
 hints_dropdown = Dropdown(900, 170, 200, 50, ["Hint"])
+undo_dropdown = Dropdown(900, 230, 200, 50, ["Undo"])
 
 status = ["", ""]
 current_player = 0
@@ -320,10 +322,12 @@ while running:
     window.blit(p1_sprites[math.floor(frame)], (850, 60))
     window.blit(p2_sprites[math.floor(frame)], (850, 120))
     window.blit(hint_sheet, (850, 180))
+    window.blit(undo_sheet, (850, 240))
     frame = (frame + 0.5) % 8
     player1_dropdown.draw(window)
     player2_dropdown.draw(window)
     hints_dropdown.draw(window)
+    undo_dropdown.draw(window)
 
     if not has_winner:
         text = font.render(status[0], True, (0, 0, 0))  # Black color
