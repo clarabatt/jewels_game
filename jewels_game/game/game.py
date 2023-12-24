@@ -57,6 +57,7 @@ class Board:
         self.board[self.height - 1][self.width - 1] = -1
         self.turn = 0
         self.highlight_pos = None
+        self.prev_boards = []
 
     def get_board(self):
         current_board = []
@@ -80,9 +81,19 @@ class Board:
 
     def add_piece(self, row, col, player):
         if self.valid_move(row, col, player):
+            self.prev_boards.append([row[:] for row in self.board])
             self.board[row][col] += player
             self.turn += 1
             return True
+        return False
+
+    def undo_move(self):
+        if self.prev_boards:
+            if len(self.prev_boards) >= 2:
+                self.board = self.prev_boards.pop()
+                self.board = self.prev_boards.pop()
+                self.turn -= 1
+                return True
         return False
 
     def check_win(self):
@@ -195,6 +206,8 @@ Y_OFFSET = 100
 FULL_DELAY = 5
 highlight_time = 0
 
+# hate the colours?  there are other options.  Just change the lines below to another colour's file name.
+# the following are available blue, pink, yellow, orange, grey, green
 p1spritesheet = pygame.image.load("assets/blue.png")
 p2spritesheet = pygame.image.load("assets/pink.png")
 hint_sheet = pygame.image.load("assets/lamp.png")
@@ -228,7 +241,6 @@ player2_dropdown = Dropdown(900, 110, 200, 50, ["Human", "AI"])
 hints_dropdown = Dropdown(900, 170, 200, 50, ["Hint"])
 undo_dropdown = Dropdown(900, 230, 200, 50, ["Undo"])
 
-best_movement = (0, 0)
 status = ["", ""]
 current_player = 0
 board = Board(GRID_SIZE[1], GRID_SIZE[0], p1_sprites, p2_sprites)
@@ -242,14 +254,23 @@ bots = [PlayerOne(), PlayerTwo()]
 grid_col = -1
 grid_row = -1
 choice = [None, None]
+best_movement = (grid_row, grid_col)
 while running:
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONUP:
             pos = pygame.mouse.get_pos()
             if hints_dropdown.rect.collidepoint(pos):
+                best_movement = bots[current_player].get_play(
+                    board.get_board())  # this is what I just invented so bad
                 # hint_move = bots[current_player].get_hint(board.get_board())
                 board.highlight_hint(best_movement)
                 highlight_time = pygame.time.get_ticks()
+
+            if undo_dropdown.rect.collidepoint(pos):
+
+                if board.undo_move() and board.undo_move():
+                    current_player = (current_player+1) % 2
+                    pygame.display.update()
 
         if event.type == pygame.QUIT:
             running = False
@@ -296,7 +317,6 @@ while running:
             if choice[current_player] == 1:
                 (grid_row, grid_col) = bots[current_player].get_play(
                     board.get_board())
-                best_movement = (grid_row, grid_col)
                 status[1] = "Bot chose row {}, col {}".format(
                     grid_row, grid_col)
                 if not board.valid_move(grid_row, grid_col, player_id[current_player]):

@@ -38,9 +38,6 @@ def overflow(grid, a_queue):
     # Deep Copy
     new_grid = [[cell for cell in row] for row in grid]
 
-    print(f"Processing grid: {new_grid}")
-    print(f"Overflow list: {overflow_list}")
-
     for cell in overflow_list:
         i = cell[0]
         j = cell[1]

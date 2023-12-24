@@ -41,7 +41,7 @@ class GameTree:
             Returns True if the game is over, False otherwise
             """
             if evaluate_board(self.board, self.player) == len(self.board) * len(
-                self.board
+                self.board[0]
             ):
                 return True
             else:
@@ -70,7 +70,7 @@ class GameTree:
             depth_player = node.player * -1
 
         new_depth = current_depth + 1
-        max_score = len(node.board) * len(node.board)
+        max_score = len(node.board) * len(node.board[0])
 
         if current_depth >= self.tree_height:
             node.score = evaluate_board(node.board, self.player) * depth_player
@@ -103,7 +103,7 @@ class GameTree:
                     new_node.move_coordinates = (i, j)
                     node.children.append(new_node)
                     if new_depth < self.tree_height - 1:
-                        if not evaluate_board(new_board, self.player) == max_score:
+                        if not new_node.score == max_score:
                             self.build_tree(new_node, new_depth)
 
     def minimax(self, node, depth, is_maximizing_player):
