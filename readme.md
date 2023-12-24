@@ -56,7 +56,7 @@ Before running the Jewels Game, ensure you have Python installed on your system.
 Navigate to the project directory and execute the following command:
 
 ```
-python jewels_game/game/game.py
+python -m jewels_game.game.game.py
 ```
 
 
