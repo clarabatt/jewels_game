@@ -12,10 +12,10 @@ import pygame
 import sys
 import math
 
-from a1_partd import overflow
-from a1_partc import Queue
-from player1 import PlayerOne
-from player2 import PlayerTwo
+from ..algo.overflow import overflow
+from ..algo.queue import Queue
+from .player1 import PlayerOne
+from .player2 import PlayerTwo
 
 
 class Dropdown:
@@ -29,7 +29,8 @@ class Dropdown:
         self.rect = pygame.Rect(x, y, width, height)
 
     def draw(self, window):
-        pygame.draw.rect(window, BLACK, (self.x, self.y, self.width, self.height), 2)
+        pygame.draw.rect(window, BLACK, (self.x, self.y,
+                         self.width, self.height), 2)
         font = pygame.font.Font(None, 36)
         text = font.render(self.options[self.current_option], 1, BLACK)
         window.blit(text, (self.x + 5, self.y + 5))
@@ -38,7 +39,8 @@ class Dropdown:
         if event.type == pygame.MOUSEBUTTONDOWN:
             x, y = event.pos
             if self.x < x < self.x + self.width and self.y < y < self.y + self.height:
-                self.current_option = (self.current_option + 1) % len(self.options)
+                self.current_option = (
+                    self.current_option + 1) % len(self.options)
 
     def get_choice(self):
         return self.current_option
@@ -193,12 +195,10 @@ Y_OFFSET = 100
 FULL_DELAY = 5
 highlight_time = 0
 
-# hate the colours?  there are other options.  Just change the lines below to another colour's file name.
-# the following are available blue, pink, yellow, orange, grey, green
-p1spritesheet = pygame.image.load("blue.png")
-p2spritesheet = pygame.image.load("pink.png")
-hint_sheet = pygame.image.load("lamp.png")
-undo_sheet = pygame.image.load("undo.png")
+p1spritesheet = pygame.image.load("assets/blue.png")
+p2spritesheet = pygame.image.load("assets/pink.png")
+hint_sheet = pygame.image.load("assets/lamp.png")
+undo_sheet = pygame.image.load("assets/undo.png")
 p1_sprites = []
 p2_sprites = []
 
@@ -228,6 +228,7 @@ player2_dropdown = Dropdown(900, 110, 200, 50, ["Human", "AI"])
 hints_dropdown = Dropdown(900, 170, 200, 50, ["Hint"])
 undo_dropdown = Dropdown(900, 230, 200, 50, ["Undo"])
 
+best_movement = (0, 0)
 status = ["", ""]
 current_player = 0
 board = Board(GRID_SIZE[1], GRID_SIZE[0], p1_sprites, p2_sprites)
@@ -247,7 +248,7 @@ while running:
             pos = pygame.mouse.get_pos()
             if hints_dropdown.rect.collidepoint(pos):
                 # hint_move = bots[current_player].get_hint(board.get_board())
-                board.highlight_hint((0, 0))
+                board.highlight_hint(best_movement)
                 highlight_time = pygame.time.get_ticks()
 
         if event.type == pygame.QUIT:
@@ -293,8 +294,11 @@ while running:
             status[0] = "Player " + str(current_player + 1) + "'s turn"
             make_move = False
             if choice[current_player] == 1:
-                (grid_row, grid_col) = bots[current_player].get_play(board.get_board())
-                status[1] = "Bot chose row {}, col {}".format(grid_row, grid_col)
+                (grid_row, grid_col) = bots[current_player].get_play(
+                    board.get_board())
+                best_movement = (grid_row, grid_col)
+                status[1] = "Bot chose row {}, col {}".format(
+                    grid_row, grid_col)
                 if not board.valid_move(grid_row, grid_col, player_id[current_player]):
                     has_winner = True
                     # if p1 makes an invalid move, p2 wins.  if p2 makes an invalid move p1 wins

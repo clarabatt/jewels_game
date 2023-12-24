@@ -1,10 +1,4 @@
-# copy over your a1_partd.py file here
-# don't forget to update your overflow() function
-
-#    Main Author(s): Oscar Daniel Camacho Cepeda, Clara Verena Brito Battesini
-#    Main Reviewer(s):
-
-from a1_partc import Queue
+from queue import Queue
 
 
 def get_overflow_list(grid):

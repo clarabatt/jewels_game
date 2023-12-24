@@ -1,6 +1,3 @@
-# Main Author: Izma Farooqui
-# Main Reviewer: Oscar Daniel Camacho Cepeda, Clara Verena Brito Battesini
-
 def check_if_both_has_same_signal(num1, num2):
     if num1 > 0 and num2 > 0:
         return True

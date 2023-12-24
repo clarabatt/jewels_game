@@ -1,9 +1,6 @@
-# Main Author: Clara Verena Brito Battesini
-# Main Reviewer: Oscar Daniel Camacho Cepeda
-
-from a1_partc import Queue
-from a1_partd import get_overflow_list, overflow
-from a3_parta import evaluate_board, check_if_both_has_same_signal
+from ..algo.queue import Queue
+from ..algo.overflow import get_overflow_list, overflow
+from .board_evaluation import evaluate_board, check_if_both_has_same_signal
 
 
 def copy_board(board):
